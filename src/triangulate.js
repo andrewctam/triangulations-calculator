@@ -1,28 +1,51 @@
 export const countDiagonals = (points) => {
-    const vertices = [];
+    let vertices = [];
 
     for (let i = 0; i < points.length; i++) {
         vertices.push({
             x: points[i].x,
-            y: -points[i].y //invert points since the origin is the top left for JS, we want origin at bottom left
+            y: window.innerHeight - points[i].y //invert points since the origin is the top left for JS, we want origin at bottom left
         })
     }
+
+    if (!isCounterClockwise(vertices))
+        vertices.reverse();
+  
+    console.log(vertices);
 
     let count = 0;
     for (let i = 0; i < vertices.length; i++) {
         for (let j = i + 1; j < vertices.length; j++) {
             if (diagonal(vertices, i, j)) {
                 count++;
-                console.log(i + " " + j)
-            }
+            } 
         }
     }
+
+
     return count;
     
 }
 
+const isCounterClockwise = (points) => {
+    let bottomMostIndex = 0;
+    for (let i = 1; i < points.length; i++) {
+        if (points[i].y < points[bottomMostIndex].y)
+            bottomMostIndex = i;
+    }
 
-const area2 = (a, b, c) => {
+    
+    let current = points[bottomMostIndex];
+    let prev = points[(bottomMostIndex - 1 + points.length) % points.length];
+    
+    console.log(prev.x)
+    console.log(current.x)
+    console.log(prev.x < current.x)
+    return prev.x < current.x;
+
+}
+
+const area2 = (a, b, c) => {   
     return (b.x - a.x) * (c.y - a.y) - (c.x - a.x) * (b.y - a.y) ;
 }
 const left = (a, b, c) => {
@@ -53,6 +76,8 @@ const between = (a, b, c) => {
     } else {
         return ((a.y <= c.y && c.y <= b.y) || (a.y >= c.y && c.y >= b.y));
     }
+
+    
 }
 const intersect = (a, b, c, d) => {
 
@@ -70,7 +95,11 @@ const isDiagonalie = (vertices, a, b) => {
         let c = vertices[ptr % vertices.length];
         let c1 = vertices[(ptr + 1) % vertices.length];
 
-        if (c.x != a.x && c.x != b.x && c1.x != a.x && c1.x != b.x && intersect(a, b, c, c1)) {
+        if (c.x != a.x && c.y != a.y &&
+            c.x != b.x && c.y != b.y &&
+            c1.x != a.x && c1.y != a.y &&
+            c1.x != b.x && c1.y != b.y &&
+            intersect(a, b, c, c1)) {
             return false;
         }
 
