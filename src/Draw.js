@@ -13,6 +13,7 @@ function Draw() {
 
         const x = e.nativeEvent.offsetX - 8
         const y = e.nativeEvent.offsetY - 8
+        console.log(x + " " + y)
         setPoints([...points, {x: x, y: y}]);
     }
     

@@ -1,23 +1,29 @@
 export const countDiagonals = (points) => {
-    const dp = new Array(points.length).fill().map(() => new Array(points.length).fill());
+    const vertices = [];
 
-    let count = 0;  
     for (let i = 0; i < points.length; i++) {
-        
+        vertices.push({
+            x: points[i].x,
+            y: -points[i].y //invert points since the origin is the top left for JS, we want origin at bottom left
+        })
     }
 
-
-
+    let count = 0;
+    for (let i = 0; i < vertices.length; i++) {
+        for (let j = i + 1; j < vertices.length; j++) {
+            if (diagonal(vertices, i, j)) {
+                count++;
+                console.log(i + " " + j)
+            }
+        }
+    }
     return count;
     
 }
 
-const helper = (points, dp, i, j) => {
-
-}
 
 const area2 = (a, b, c) => {
-    return (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x);
+    return (b.x - a.x) * (c.y - a.y) - (c.x - a.x) * (b.y - a.y) ;
 }
 const left = (a, b, c) => {
     return area2(a, b, c) > 0;
@@ -37,6 +43,7 @@ const intersectProp = (a, b, c, d) => {
     return (left(a, b, c) ^ left(a, b, d)) && (left(c, d, a) ^ left(c, d, b));
 }
 const between = (a, b, c) => {
+    
     if (!collinear(a, b, c)) {
         return false;
     }
@@ -48,6 +55,7 @@ const between = (a, b, c) => {
     }
 }
 const intersect = (a, b, c, d) => {
+
     if (intersectProp(a, b, c, d)) {
         return true;
     } 
@@ -55,38 +63,39 @@ const intersect = (a, b, c, d) => {
 }
 
 
-const isDiagonalie = (points, a, b) => {
+const isDiagonalie = (vertices, a, b) => {
     //using an array instead of a linked list like structure on the slides, so we need a ptr
     let ptr = 0;
     do {
-        let c = points[ptr];
-        let c1 = points[ptr + 1];
+        let c = vertices[ptr % vertices.length];
+        let c1 = vertices[(ptr + 1) % vertices.length];
 
-        if (c != a && c1 != a && c != b && c1 != b && intersect(a,b,c,c1))
+        if (c.x != a.x && c.x != b.x && c1.x != a.x && c1.x != b.x && intersect(a, b, c, c1)) {
             return false;
-        
+        }
+
         ptr++;
 
-    } while (c != points[0])
+    } while (ptr % vertices.length != 0)
 
-    return true
+    return true;
 }
 
-const inCone = (points, i, j) => {
-    let a = points[i];
-    let b = points[j];
+const inCone = (vertices, i, j) => {
+    let a = vertices[i];
+    let b = vertices[j];
 
-    let a1 = points[i + 1];
-    let a0 = points[i - 1];
+    let a1 = vertices[(i + 1) % vertices.length];
+    let a0 = vertices[(i - 1 + vertices.length) % vertices.length];
 
 
-    if (leftOn(a, a1, a0))
+    if (leftOn(a, a1, a0)) {
         return left(a, b, a0) && left(b, a, a1);
-    else
+    } else
         return !(leftOn(a, b, a1) && leftOn(b, a, a0));
 }
     
 
-const diagonal = (points, i, j) => {
-    return isDiagonalie(points, points[i], points[j]) && inCone(points, i, j) && inCone(points, j, i);
+const diagonal = (vertices, i, j) => {
+    return isDiagonalie(vertices, vertices[i], vertices[j]) && inCone(vertices, i, j) && inCone(vertices, j, i);
 }
