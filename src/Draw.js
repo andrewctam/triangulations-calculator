@@ -1,15 +1,12 @@
 import Point from './Point';
 import Edge from './Edge';
 import { useState } from "react";
+import { countDiagonals } from './triangulate';
 
 function Draw() {
     const [points, setPoints] = useState([]);
     const [building, setBuilding] = useState(true);
 
-    const closePolygon = () => {            
-        setBuilding(false)
-    }
-    
     const createPoint = (e) => {
         if (!building)
             return;
@@ -19,6 +16,10 @@ function Draw() {
         setPoints([...points, {x: x, y: y}]);
     }
     
+    const closePolygon = () => {            
+        setBuilding(false)
+    }
+
     const undo = (e) => {
         if (e.keyCode === 8) {
             if (building)
@@ -27,11 +28,6 @@ function Draw() {
                 setBuilding(true)
         }
     }
-    
-    const countDiagonals = () => {
-        const dp = []
-    }
-
 
     const edges = []
     for (let i = 0; i < points.length - 1; i++) {
@@ -47,7 +43,7 @@ function Draw() {
 
     }
 
-    if (!building) 
+    if (!building)  {
         edges.push(
             <Edge
                 key = {"edge" + points.length}
@@ -58,12 +54,16 @@ function Draw() {
                 y2 = {points[points.length - 1].y + 8} 
             />
         )
-    
+    }
 
     return (
         <div onClick={createPoint} onKeyDown = {undo} tabIndex = {-1} className="relative w-full h-screen select-none bg-stone-400">
-           
-            {points.map((point, i) => <Point 
+            {building ? null : 
+                <p className = "text-black text-center text-xl p-2 bg-white">{countDiagonals(points) + " triangulations"}</p>
+            }
+
+            {points.map((point, i) => 
+            <Point 
                 id = {i} 
                 key = {"vertex" + i} 
                 x = {point.x}
@@ -72,6 +72,9 @@ function Draw() {
                 closePolygon = {closePolygon}/>)}
 
             {edges}
+
+
+            
             
         </div>
     );
