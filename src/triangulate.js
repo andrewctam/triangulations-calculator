@@ -1,48 +1,87 @@
+var dp = [];
+
 export const countDiagonals = (points) => {
+    
     let vertices = [];
 
+    //invert points since the origin is the top left for html, we want origin at bottom left
     for (let i = 0; i < points.length; i++) {
         vertices.push({
             x: points[i].x,
-            y: window.innerHeight - points[i].y //invert points since the origin is the top left for JS, we want origin at bottom left
+            y: window.innerHeight - points[i].y 
         })
     }
 
-    if (!isCounterClockwise(vertices))
+    //determine if points are counter clockwise
+    let bottomMostIndex = 0;
+    let leftMost = 0;
+
+    for (let i = 1; i < vertices.length; i++) {
+        if (vertices[i].y < vertices[bottomMostIndex].y)
+            bottomMostIndex = i;
+        if (vertices[i].x < vertices[leftMost].x)
+            leftMost = i;
+    }
+    
+    let current = vertices[bottomMostIndex];
+    let bottomPrevIndex = (bottomMostIndex - 1 + vertices.length) % vertices.length;
+    let prev = vertices[bottomPrevIndex];
+    
+    //if the points are not in counter clockwise order, reverse them
+    if (prev.x > current.x)
         vertices.reverse();
   
-    console.log(vertices);
 
-    let count = 0;
-    for (let i = 0; i < vertices.length; i++) {
-        for (let j = i + 1; j < vertices.length; j++) {
-            if (diagonal(vertices, i, j)) {
-                count++;
-            } 
-        }
-    }
-
-
-    return count;
+    dp = new Array(vertices.length).fill(null).map(() => new Array(vertices.length).fill(0));
     
+    //tabulate diagonals left of bottom most vertex
+    return countToLeft(vertices, vertices.length - 1, 0, false);
 }
 
-const isCounterClockwise = (points) => {
-    let bottomMostIndex = 0;
-    for (let i = 1; i < points.length; i++) {
-        if (points[i].y < points[bottomMostIndex].y)
-            bottomMostIndex = i;
-    }
+const countToLeft = (vertices, start, end) => {
+    if (dp[start][end] !== 0)
+        return dp[start][end];
 
-    
-    let current = points[bottomMostIndex];
-    let prev = points[(bottomMostIndex - 1 + points.length) % points.length];
-    
-    console.log(prev.x)
-    console.log(current.x)
-    console.log(prev.x < current.x)
-    return prev.x < current.x;
+        debugger;
+    let count = 0;
 
+    let low = Math.min(start, end)
+    let high = Math.max(start, end)
+    
+    for (let i = low; i != high; ) {
+        if (left(vertices[start], vertices[end], vertices[i])) {
+            let startFormsEdge = isEdge(vertices, start, i)
+            let endFormsEdge = isEdge(vertices, end, i)
+            
+            let startFormsDiagonal = diagonal(vertices, start, i)
+            let endFormsDiagonal = diagonal(vertices, end, i)   
+
+            if ((startFormsDiagonal && endFormsDiagonal) || 
+                ((startFormsDiagonal || endFormsDiagonal) && (startFormsEdge ^ endFormsEdge))) {
+
+                count += countToLeft(vertices, start, i) * countToLeft(vertices, i, end);
+            }
+        }
+
+
+        if (i == vertices.length - 1)
+            i = 0;
+        else
+            i++;    
+    }    
+
+    if (count == 0)
+        count = 1; //base case
+
+
+    dp[start][end] = count;
+    console.log(dp)
+    return count;
+       
+}
+
+const isEdge = (vertices, i, j) => {
+    return Math.abs(i - j) == 1 || Math.abs(i - j) == vertices.length - 1;
 }
 
 const area2 = (a, b, c) => {   
