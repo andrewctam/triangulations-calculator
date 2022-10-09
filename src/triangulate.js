@@ -3,19 +3,19 @@ var dp = [];
 export const countDiagonals = (points) => {
     let vertices = [];
 
-    //invert points since the origin is the top left for html, we want origin at bottom left
     for (let i = 0; i < points.length; i++) {
         vertices.push({
             x: points[i].x,
-            y: - points[i].y 
+            y: -points[i].y  //invert points since the origin is the top left for html, we want origin at bottom left
         })
     }
 
+    console.log(vertices)
     //if the area is negative, the points are in clockwise order, so reverse them
     if (areaPolygon(vertices) < 0)
         vertices.reverse();
   
-    //matrix to store results
+    //dp matrix to store results
     dp = new Array(vertices.length).fill(null).map(() => new Array(vertices.length).fill(0));
 
     //tabulate diagonals. 0 and vertices.length - 1 are swapped since we need the range, but we also need the correct direction
@@ -32,7 +32,7 @@ const countToLeft = (vertices, start, end) => {
     let low = Math.min(start, end)
     let high = Math.max(start, end)
 
-    for (let i = low; i != high; ) {
+    for (let i = low; i !== high; ) {
         if (left(vertices[start], vertices[end], vertices[i])) {
             let startFormsEdge = isEdge(vertices, start, i) //start and i form an edge
             let endFormsEdge = isEdge(vertices, end, i) //end and i form an edge
@@ -40,23 +40,23 @@ const countToLeft = (vertices, start, end) => {
             let startFormsDiagonal = diagonal(vertices, start, i) //start and i form a diagonal
             let endFormsDiagonal = diagonal(vertices, end, i) //end and i form a diagonal
 
-            //2 cases: a triangle fromed with 2 diagonals or 1 diagonal 1 edge
+            //2 cases: a triangle formed with 2 diagonals or 1 diagonal 1 edge
             if ((startFormsDiagonal && endFormsDiagonal) || 
                 ((startFormsDiagonal || endFormsDiagonal) && (startFormsEdge ^ endFormsEdge))) {
 
-                //recursively calculate diagonals
+                //recursively calculate diagonals, left of edge (start, i) and right of (end, i)
                 count += countToLeft(vertices, start, i) * countToLeft(vertices, i, end);
             }
         }
 
-        //wrap around if necessary
-        if (i == vertices.length - 1)
-            i = 0;
+        
+        if (i === vertices.length - 1)
+            i = 0; //wrap around from start to end
         else
             i++;    
     }    
 
-    if (count == 0)
+    if (count === 0)
         count = 1; //base case, no left found
 
 
@@ -68,7 +68,7 @@ const countToLeft = (vertices, start, end) => {
 
 
 const isEdge = (vertices, i, j) => {
-    return Math.abs(i - j) == 1 || Math.abs(i - j) == vertices.length - 1;
+    return Math.abs(i - j) === 1 || Math.abs(i - j) === vertices.length - 1;
 }
 
 //below are the predicates from slides
@@ -98,7 +98,7 @@ const between = (a, b, c) => {
         return false;
     }
     
-    if (a.x != b.x) {
+    if (a.x !== b.x) {
         return ((a.x <= c.x && c.x <= b.x) || (a.x >= c.x && c.x >= b.x));
     } else {
         return ((a.y <= c.y && c.y <= b.y) || (a.y >= c.y && c.y >= b.y));
@@ -122,17 +122,17 @@ const isDiagonalie = (vertices, a, b) => {
         let c = vertices[ptr % vertices.length];
         let c1 = vertices[(ptr + 1) % vertices.length];
 
-        if (c.x != a.x && c.y != a.y &&
-            c.x != b.x && c.y != b.y &&
-            c1.x != a.x && c1.y != a.y &&
-            c1.x != b.x && c1.y != b.y &&
+        if (c.x !== a.x && c.y !== a.y &&
+            c.x !== b.x && c.y !== b.y &&
+            c1.x !== a.x && c1.y !== a.y &&
+            c1.x !== b.x && c1.y !== b.y &&
             intersect(a, b, c, c1)) {
             return false;
         }
 
         ptr++;
 
-    } while (ptr % vertices.length != 0)
+    } while (ptr % vertices.length !== 0)
 
     return true;
 }
@@ -157,7 +157,6 @@ const diagonal = (vertices, i, j) => {
 }
 
 
-
 const areaPolygon = (vertices) => {
     //using an array instead of a linked list like structure on the slides, so we need a ptr
     let ptr = 0;
@@ -169,7 +168,7 @@ const areaPolygon = (vertices) => {
 
         ptr = nextPtr;
 
-    } while (ptr % vertices.length != 0)
+    } while (ptr % vertices.length !== 0)
 
     return sum;
 }
