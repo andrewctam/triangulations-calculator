@@ -1,14 +1,12 @@
 var dp = [];
 
 export const countDiagonals = (points) => {
-    let vertices = [];
-
-    for (let i = 0; i < points.length; i++) {
-        vertices.push({
-            x: points[i].x,
-            y: -points[i].y  //invert points since the origin is the top left for html, we want origin at bottom left
-        })
-    }
+    let vertices = points.map((p) => {
+        return {
+            x: p.x,
+            y: -p.y  //invert y since the origin is the top left for html, we want origin at bottom left
+        };
+    });
 
     console.log(vertices)
     //if the area is negative, the points are in clockwise order, so reverse them
@@ -51,7 +49,7 @@ const countToLeft = (vertices, start, end) => {
 
         
         if (i === vertices.length - 1)
-            i = 0; //wrap around from start to end
+            i = 0; //wrap around from end
         else
             i++;    
     }    

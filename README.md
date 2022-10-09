@@ -9,7 +9,7 @@ A website that allows you to add points using your mouse to create a polygon, th
 ![Demo 3](demo3.png)
 
 ## Installation
-Clone this repository and install npm dependencies. Then, start the local server.
+If you don't have node.js installed, install it [here](https://nodejs.org/en/download/). Then, clone this repository and install npm dependencies. Start the local server, which should start on http://localhost:3000.
 
 ```
 git clone https://github.com/tamandrew/triangulations-calculator.git
