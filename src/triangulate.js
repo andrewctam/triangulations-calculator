@@ -26,7 +26,7 @@ const countToLeft = (vertices, start, end) => {
 
     let count = 0;
 
-    //only need to consider vertices between the min and max
+    //only need to consider vertices between the start and end
     let low = Math.min(start, end)
     let high = Math.max(start, end)
 
@@ -35,8 +35,8 @@ const countToLeft = (vertices, start, end) => {
             let startFormsEdge = isEdge(vertices, start, i) //start and i form an edge
             let endFormsEdge = isEdge(vertices, end, i) //end and i form an edge
             
-            let startFormsDiagonal = diagonal(vertices, start, i) //start and i form a diagonal
-            let endFormsDiagonal = diagonal(vertices, end, i) //end and i form a diagonal
+            let startFormsDiagonal = isDiagonal(vertices, start, i) //start and i form a diagonal
+            let endFormsDiagonal = isDiagonal(vertices, end, i) //end and i form a diagonal
 
             //2 cases: a triangle formed with 2 diagonals or 1 diagonal 1 edge
             if ((startFormsDiagonal && endFormsDiagonal) || 
@@ -150,7 +150,7 @@ const inCone = (vertices, i, j) => {
 }
     
 
-const diagonal = (vertices, i, j) => {
+const isDiagonal = (vertices, i, j) => {
     return isDiagonalie(vertices, vertices[i], vertices[j]) && inCone(vertices, i, j) && inCone(vertices, j, i);
 }
 
